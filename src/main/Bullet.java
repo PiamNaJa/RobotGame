@@ -4,15 +4,13 @@ import java.io.Serializable;
 import java.awt.Color;
 public class Bullet implements Serializable
 {
-    Client c;
     int dx, dy, x, y, width, height, speed, xx, yy;
     String direction;
-    public Bullet(Client c, int x, int y, String direction)
+    public Bullet(int x, int y, String direction, int tileSize)
     {
-        this.c = c;
         this.x = x;
         this.y = y;
-        this.height = this.width = this.speed = c.tileSize;
+        this.height = this.width = this.speed = tileSize;
         this.direction = direction;
         dx = dy = 0;
     }
@@ -41,10 +39,10 @@ public class Bullet implements Serializable
         this.x += dx;
         this.y += dy;
     }
-    public void draw(Graphics2D g)
+    public void draw(Graphics2D g, int px, int py , int Xscreen, int Yscreen)
 	{
-        xx = this.x -  c.x[c.pid] + c.Xscreen;
-        yy = this.y - c.y[c.pid] + c.Yscreen;
+        xx = this.x -  px + Xscreen;
+        yy = this.y - py + Yscreen;
         g.setColor(Color.MAGENTA);
 		g.fillRect(xx+13, yy+13, this.width/4, this.height/4);
 	}

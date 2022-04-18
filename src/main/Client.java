@@ -37,7 +37,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
     Tile tile;
     Bomb bomb;
     ET et;
-    ArrayList<Bullet> bullet = new ArrayList<Bullet>();
+    ArrayList<Bullet> bullet;
     public int tileSize = 32;
     public int ScreenCol = 25;
     public int ScreenRow = 20;
@@ -55,7 +55,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
     int[] health = new int[10];
     int dx = 0, dy = 0, move = 0, Myavatar[] = new int[10];
     boolean running;
-    boolean up = false, left = false, down = false, right = false, Pfire = false, quit = false;
+    boolean up = false, left = false, down = false, right = false, Pfire = false, quit = false, Phit = false;;
     boolean count = false;
     boolean showdead = false;
     boolean step = false;
@@ -115,6 +115,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
             Myavatar[pid] = (int) in.readObject();
             bomb = (Bomb) in.readObject();
             et = (ET) in.readObject();
+            bullet = (ArrayList<Bullet>) in.readObject();
             name[pid] = JOptionPane.showInputDialog("Please Enter Username");
             health[pid] = 100;
             pIMG[pid] = downwalk[Myavatar[pid]];
@@ -161,7 +162,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
     }
 
     public void updateLocation(int pid, int x, int y, Bomb b, boolean fire, String direction, int health, ET et,
-            int avatar, String name, Color color) {
+            int avatar, String name, Color color, ArrayList<Bullet> bull) {
         this.x[pid] = x;
         this.y[pid] = y;
         this.bomb = b;
@@ -186,6 +187,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
         }
         this.name[pid] = name;
         this.color[pid] = color;
+        this.bullet = bull;
     }
 
     public void paint(Graphics g) {
@@ -206,7 +208,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
         }
         for (int i = 0; i < bullet.size(); i++)
         {
-            bullet.get(i).draw(g2);
+            bullet.get(i).draw(g2, x[pid],y[pid], Xscreen, Yscreen);
         }
         Font f = new Font("Angsana New", Font.BOLD, 35);
         FontMetrics metrics = g2.getFontMetrics(f);
@@ -321,7 +323,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
         } else if (dy > 99 * tileSize) {
             dy = 99 * tileSize;
         }
-        if (up || right || left || down || Pfire || quit || step) {
+        if (up || right || left || down || Pfire || quit || step || Phit) {
             System.out.println(dx + " " + dy);
             try {
                 out.writeObject(pid);
@@ -335,7 +337,8 @@ public class Client extends JPanel implements Runnable, KeyListener {
                 out.writeObject(Myavatar[pid]);
                 out.writeObject(name[pid]);
                 out.writeObject(color[pid]);
-                Pfire = up = down = left = right = step = false;
+                out.writeObject(bullet);
+                Pfire = up = down = left = right = step = Phit = false;
                 if(quit)
                 {
                     shutdown();
@@ -343,6 +346,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
                 }
             } catch (Exception e) {
                 System.out.println("Error Sending Location ");
+                e.printStackTrace();
             }
         }
 
@@ -407,7 +411,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
         {
             if (bullet.get(i).x < 0 || bullet.get(i).x > 80 * tileSize || bullet.get(i).y < 0
                     || bullet.get(i).y > 100 * tileSize) {
-                bullet.remove(i--);
+                bullet.remove(i);
                 break;
             }
         }
@@ -417,7 +421,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
                 if (bullet.get(i).x == bomb.x[j] && bullet.get(i).y == bomb.y[j]) {
                     bomb.x[j] = bomb.newposX();
                     bomb.x[j] = bomb.newposY();
-                    bullet.remove(i--);
+                    bullet.remove(i);
                     break;
                 }
 
@@ -427,7 +431,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
             for (int j = 0; j < bullet.size(); j++)// เช็คว่ายิงET
             {
                 if (bullet.get(j).x == et.x[i] && bullet.get(j).y == et.y[i]) {
-                    bullet.remove(j--);
+                    bullet.remove(j);
                     break;
                 }
             }
@@ -435,8 +439,8 @@ public class Client extends JPanel implements Runnable, KeyListener {
         for (int j = 0; j < bullet.size(); j++)// เช็คว่าโดนยิง
         {
             if (bullet.get(j).x == x[pid] && bullet.get(j).y == y[pid]) {
-                hit = true;
-                bullet.remove(j--);
+                Phit = hit = true;
+                bullet.remove(j);
                 break;
             }
         }
@@ -450,23 +454,20 @@ public class Client extends JPanel implements Runnable, KeyListener {
     public void run() {
         while (running) {
             if (Thread.currentThread().getName().equals("Fire")) {
-                for (int i = 0; i < 10; i++) {
-                    if (fire[i]) {
-                        if (direction[i].equals("up")) {
-                            bullet.add(new Bullet(this, x[i], y[i] - tileSize, direction[i]));
-                        } else if (direction[i].equals("down")) {
-                            bullet.add(new Bullet(this, x[i], y[i] + tileSize, direction[i]));
-                        } else if (direction[i].equals("left")) {
-                            bullet.add(new Bullet(this, x[i] - tileSize, y[i], direction[i]));
-                        } else if (direction[i].equals("right")) {
-                            bullet.add(new Bullet(this, x[i] + tileSize, y[i], direction[i]));
-                        }
-                        fire[i] = false;
-                        try {
-                            Thread.currentThread().sleep(2000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                if (Pfire) {
+                    if (direction[pid].equals("up")) {
+                        bullet.add(new Bullet(x[pid], y[pid] - tileSize, direction[pid], tileSize));
+                    } else if (direction[pid].equals("down")) {
+                        bullet.add(new Bullet(x[pid], y[pid] + tileSize, direction[pid], tileSize));
+                    } else if (direction[pid].equals("left")) {
+                        bullet.add(new Bullet(x[pid] - tileSize, y[pid], direction[pid], tileSize));
+                    } else if (direction[pid].equals("right")) {
+                        bullet.add(new Bullet(x[pid] + tileSize, y[pid], direction[pid], tileSize));
+                    }
+                    try {
+                        Thread.currentThread().sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             } else if (Thread.currentThread().getName().equals("BulletTick")) {
@@ -596,7 +597,8 @@ public class Client extends JPanel implements Runnable, KeyListener {
                     int p = (int) in.readObject();
                     String name = (String) in.readObject();
                     Color color = (Color) in.readObject();
-                    c.updateLocation(pid, x, y, b, fire, direction, health, et, p, name, color);
+                    ArrayList<Bullet> bullet = (ArrayList<Bullet>) in.readObject();
+                    c.updateLocation(pid, x, y, b, fire, direction, health, et, p, name, color, bullet);
                 } catch (IOException e) {
                     System.out.println("Fail to update");
                     shutdown();

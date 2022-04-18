@@ -5,6 +5,7 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Random;
 import java.awt.image.BufferedImage;
 
@@ -95,6 +96,7 @@ public class Server implements Runnable {
         ET et, etin;
         String directionin, namein;
         Color colorin;
+        ArrayList<Bullet> bullet, bulletin;
         int pid, pidin, xin, yin, healthin, randAvatar, avatarin;
         boolean fire, running;
 
@@ -105,6 +107,7 @@ public class Server implements Runnable {
             this.et = et;
             this.randAvatar = avatar;
             running = true;
+            bullet = new ArrayList<Bullet>();
         }
 
         @Override
@@ -116,6 +119,7 @@ public class Server implements Runnable {
                 out.writeObject(randAvatar);
                 out.writeObject(bomb);
                 out.writeObject(et);
+                out.writeObject(bullet);
             } catch (IOException e2) {
                 System.out.println("Failed to send PID");
             }
@@ -132,6 +136,7 @@ public class Server implements Runnable {
                     avatarin = (int) in.readObject();
                     namein = (String) in.readObject();
                     colorin = (Color) in.readObject();
+                    bulletin = (ArrayList<Bullet>) in.readObject();
                     for (int i = 0; i < 10; i++) {
                         if (user[i] != null) {
                             user[i].out.writeObject(pidin);
@@ -145,6 +150,7 @@ public class Server implements Runnable {
                             user[i].out.writeObject(avatarin);
                             user[i].out.writeObject(namein);
                             user[i].out.writeObject(colorin);
+                            user[i].out.writeObject(bulletin);
                         }
                     }
                 } catch (IOException e) {
