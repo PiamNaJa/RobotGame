@@ -46,8 +46,6 @@ public class Client extends JPanel implements Runnable, KeyListener {
     int Xscreen = (25 * 32) / 2 - (32) / 2;
     int Yscreen = (20 * 32) / 2 - (32) / 2;
     int pid, a = 0;
-    boolean count = false;
-    boolean showdead = false;
     int c_up = 0;
     int c_left = 0; 
     int c_down = 0;
@@ -58,6 +56,9 @@ public class Client extends JPanel implements Runnable, KeyListener {
     int dx = 0, dy = 0, move = 0, Myavatar[] = new int[10];
     boolean running;
     boolean up = false, left = false, down = false, right = false, Pfire = false, quit = false;
+    boolean count = false;
+    boolean showdead = false;
+    boolean step = false;
     boolean fire[] = new boolean[10];
     String direction[] = new String[10];
     String Pdirection = "up";
@@ -320,7 +321,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
         } else if (dy > 99 * tileSize) {
             dy = 99 * tileSize;
         }
-        if (up || right || left || down || Pfire || quit) {
+        if (up || right || left || down || Pfire || quit || step) {
             System.out.println(dx + " " + dy);
             try {
                 out.writeObject(pid);
@@ -334,7 +335,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
                 out.writeObject(Myavatar[pid]);
                 out.writeObject(name[pid]);
                 out.writeObject(color[pid]);
-                Pfire = up = down = left = right = false;
+                Pfire = up = down = left = right = step = false;
                 if(quit)
                 {
                     shutdown();
@@ -366,6 +367,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
             bomb.x[removebomb] = bomb.newposX();
             bomb.x[removebomb] = bomb.newposY();
             health[pid] -= 5;
+            step = true;
         }
         for (int i = 0; i < ETn; i++) // เช็คว่าตัวละครเหยียบ ET
         {
@@ -373,6 +375,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
                 if (et.energy[i] > 0 && health[pid] < 100) {
                     health[pid] += 5;
                     et.energy[i] -= 5;
+                    step = true;
                     break;
                 }
             }
@@ -383,10 +386,6 @@ public class Client extends JPanel implements Runnable, KeyListener {
                 et.gooutside(i);
             }
         }
-        // if(health[pid] <= 0)
-        // {
-        // System.exit(0);
-        // }
         if(health[pid] <= 0)
         {
             x[pid] = y[pid] = -3000;
