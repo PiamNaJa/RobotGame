@@ -148,6 +148,7 @@ public class Client extends JPanel implements Runnable, KeyListener {
 
     public void shutdown() {
         try {
+            x[pid] = y[pid] = -3000;
             running = false;
             out.close();
             in.close();
@@ -392,7 +393,6 @@ public class Client extends JPanel implements Runnable, KeyListener {
         }
         if(health[pid] <= 0)
         {
-            x[pid] = y[pid] = -3000;
             quit = true;
             return;
         }
