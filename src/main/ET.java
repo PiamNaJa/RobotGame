@@ -11,6 +11,7 @@ import java.io.Serializable;
 
 public class ET implements Serializable
 {
+	private Random rand;
 	int x[], y[], positionx[], positiony[],energy[];
 	public ET(int[] x, int[] y, int[] energy)
 	{
@@ -18,8 +19,7 @@ public class ET implements Serializable
         this.y = y;
         this.positionx = new int[x.length];
         this.positiony = new int[y.length];
-		// x = (int)((Math.random() * 80)) * 32;
-		// y = (int)((Math.random() * 100)) * 32;
+		rand = new Random();
         this.energy = energy;
 	}
 	public void draw(Graphics2D g, int px, int py, int screenX, int screenY, BufferedImage img)
@@ -37,11 +37,11 @@ public class ET implements Serializable
 	}
 	public int newposX()
 	{
-		return (int)((Math.random() * 80)) * 32;
+		return rand.nextInt(80) * 32;
 	}
 	public int newposY()
 	{
-		return (int)((Math.random() * 100)) * 32;
+		return rand.nextInt(100) * 32;
 	}
 	public void gooutside(int index)
 	{

@@ -401,7 +401,6 @@ public class Client extends JPanel implements Runnable, KeyListener {
             if(health[i] <= 0 && name[i] != null)
             {
                 whodead =  "Player " + name[i] + " " + " Dead";
-                // System.out.println(whodead);
                 showdead = true;
                 name[i] = null;
                 direction[i] = null;
@@ -409,39 +408,55 @@ public class Client extends JPanel implements Runnable, KeyListener {
         }
         for (int i = 0; i < bullet.size(); i++)// Border hit by bullet
         {
-            if (bullet.get(i).x < 0 || bullet.get(i).x > 80 * tileSize || bullet.get(i).y < 0
-                    || bullet.get(i).y > 100 * tileSize) {
-                bullet.remove(i);
-                break;
+            if(i < bullet.size() && !bullet.isEmpty())
+            {
+                if (bullet.get(i).x < 0 || bullet.get(i).x > 80 * tileSize || bullet.get(i).y < 0 || bullet.get(i).y > 100 * tileSize) 
+                {
+                    bullet.remove(i);
+                    break;
+                }
             }
         }
         for (int i = 0; i < bullet.size(); i++) {
             for (int j = 0; j < bn; j++) // เช็คว่ากระสุนชนระเบิด
             {
-                if (bullet.get(i).x == bomb.x[j] && bullet.get(i).y == bomb.y[j]) {
+                if(i < bullet.size() && !bullet.isEmpty())
+                {
+                    if (bullet.get(i).x == bomb.x[j] && bullet.get(i).y == bomb.y[j]) 
+                    {
                     bomb.x[j] = bomb.newposX();
                     bomb.x[j] = bomb.newposY();
                     bullet.remove(i);
                     break;
+                    }
                 }
+                
 
             }
         }
         for (int i = 0; i < ETn; i++) {
             for (int j = 0; j < bullet.size(); j++)// เช็คว่ายิงET
             {
-                if (bullet.get(j).x == et.x[i] && bullet.get(j).y == et.y[i]) {
-                    bullet.remove(j);
-                    break;
+                if(j < bullet.size() && !bullet.isEmpty())
+                {
+                    if (bullet.get(j).x == et.x[i] && bullet.get(j).y == et.y[i]) 
+                    {
+                        bullet.remove(j);
+                        break;
+                    }
                 }
             }
         }
         for (int j = 0; j < bullet.size(); j++)// เช็คว่าโดนยิง
         {
-            if (bullet.get(j).x == x[pid] && bullet.get(j).y == y[pid]) {
-                Phit = hit = true;
-                bullet.remove(j);
-                break;
+            if(j < bullet.size() && !bullet.isEmpty())
+            {
+                if (bullet.get(j).x == x[pid] && bullet.get(j).y == y[pid]) 
+                {
+                    Phit = hit = true;
+                    bullet.remove(j);
+                    break;
+                }
             }
         }
         if (hit) {

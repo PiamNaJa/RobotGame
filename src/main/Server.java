@@ -15,25 +15,26 @@ public class Server implements Runnable {
     private int randbomb, bx[], by[], randET, ETx[], ETy[], randenergy[] = { 50, 55, 60, 65, 70, 75, 80, 85, 90, 95 },
             energy[];
     private int randavatar[] = { 0, 1, 2, 3, 4}, avatar, randindex;
-
+    private Random rand;
     public Server() {
-        randbomb = new Random().nextInt((320 - 240) + 1) + 240;
-        randET = new Random().nextInt((24 - 16) + 1) + 16;
+        rand = new Random();
+        randbomb = rand.nextInt((320 - 240) + 1) + 240;
+        randET = rand.nextInt((24 - 16) + 1) + 16;
         bx = new int[randbomb];
         by = new int[randbomb];
         ETx = new int[randET];
         ETy = new int[randET];
         energy = new int[randET];
         for (int i = 0; i < randbomb; i++) {
-            bx[i] = (int) ((Math.random() * 79)) * 32;
-            by[i] = (int) ((Math.random() * 99)) * 32;
+            bx[i] = rand.nextInt(80) * 32;
+            by[i] = rand.nextInt(100) * 32;
         }
         for (int i = 0; i < randET; i++) {
-            ETx[i] = (int) ((Math.random() * 79)) * 32;
-            ETy[i] = (int) ((Math.random() * 99)) * 32;
+            ETx[i] = rand.nextInt(80) * 32;
+            ETy[i] = rand.nextInt(100) * 32;
         }
         for (int i = 0; i < randET; i++) {
-            energy[i] = randenergy[new Random().nextInt(randenergy.length)];
+            energy[i] = randenergy[rand.nextInt(randenergy.length)];
         }
     }
 
@@ -63,7 +64,7 @@ public class Server implements Runnable {
                 for (int i = 0; i < 10; i++) {
                     if (user[i] == null) {
                         for (int j = 0; j < randavatar.length; j++) {
-                            randindex = new Random().nextInt(randavatar.length);
+                            randindex = rand.nextInt(randavatar.length);
                             avatar = randavatar[randindex];
                             randavatar = remove(randavatar, randindex);
                         }
